@@ -90,20 +90,30 @@ export function createHoverPreview({
     openTimer = view.setTimeout(() => open(target), openDelayMs);
   };
 
-  const onPointerEnter = (event) => {
+  const onEnter = (event) => {
     const target = resolveProposalTarget(event.target);
     if (target) {
       requestOpen(target);
       return;
     }
-    if (event.target instanceof Element && event.target.closest(".fhp-panel")) {
+    if (event.target instanceof Node && panel.element.contains(event.target)) {
       cancelClose();
       return;
     }
     cancelOpen();
   };
 
-  const onPointerLeave = () => {
+  /** True while the pointer only moved within the cell it was already on. */
+  const stillInside = (node) =>
+    node instanceof Node &&
+    Boolean(
+      pending?.element.contains(node) ||
+        shown?.element.contains(node) ||
+        panel.element.contains(node),
+    );
+
+  const onLeave = (event) => {
+    if (stillInside(event.relatedTarget)) return;
     cancelOpen();
     if (!panel.isVisible()) return;
     cancelClose();
@@ -121,10 +131,10 @@ export function createHoverPreview({
       if (running) return;
       running = true;
       doc.body.append(panel.element);
-      root.addEventListener("mouseover", onPointerEnter, true);
-      root.addEventListener("focusin", onPointerEnter, true);
-      root.addEventListener("mouseout", onPointerLeave, true);
-      root.addEventListener("focusout", onPointerLeave, true);
+      root.addEventListener("mouseover", onEnter, true);
+      root.addEventListener("focusin", onEnter, true);
+      root.addEventListener("mouseout", onLeave, true);
+      root.addEventListener("focusout", onLeave, true);
       doc.addEventListener("keydown", onKeyDown, true);
       view.addEventListener("scroll", place, true);
       view.addEventListener("resize", place);
@@ -134,10 +144,10 @@ export function createHoverPreview({
       if (!running) return;
       running = false;
       close();
-      root.removeEventListener("mouseover", onPointerEnter, true);
-      root.removeEventListener("focusin", onPointerEnter, true);
-      root.removeEventListener("mouseout", onPointerLeave, true);
-      root.removeEventListener("focusout", onPointerLeave, true);
+      root.removeEventListener("mouseover", onEnter, true);
+      root.removeEventListener("focusin", onEnter, true);
+      root.removeEventListener("mouseout", onLeave, true);
+      root.removeEventListener("focusout", onLeave, true);
       doc.removeEventListener("keydown", onKeyDown, true);
       view.removeEventListener("scroll", place, true);
       view.removeEventListener("resize", place);
