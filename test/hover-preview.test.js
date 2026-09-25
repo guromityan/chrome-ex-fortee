@@ -19,7 +19,8 @@ const OTHER_TALK = {
 const cellOf = (url) => document.querySelector(`.proposal:has(a[href$="${url.split("/").pop()}"])`);
 
 const hover = (node) => node.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
-const unhover = (node) => node.dispatchEvent(new MouseEvent("mouseout", { bubbles: true }));
+const unhover = (node, relatedTarget = null) =>
+  node.dispatchEvent(new MouseEvent("mouseout", { bubbles: true, relatedTarget }));
 
 const panelText = () => document.querySelector(".fhp-panel")?.textContent ?? "";
 const panelIsVisible = () => {
@@ -99,6 +100,21 @@ describe("hover preview", () => {
 
     expect(requested).toEqual([]);
     expect(panelIsVisible()).toBe(false);
+  });
+
+  test("keeps waiting while the pointer crosses parts of the same cell", async () => {
+    startPreview();
+    const cell = cellOf(TALK.url);
+    const title = cell.querySelector(".title");
+    const speaker = cell.querySelector(".speaker");
+
+    hover(title);
+    await vi.advanceTimersByTimeAsync(OPEN_DELAY - 40);
+    unhover(title, speaker);
+    hover(speaker);
+    await vi.advanceTimersByTimeAsync(40);
+
+    expect(requested).toEqual([TALK.url]);
   });
 
   test("hides the panel shortly after the pointer leaves", async () => {

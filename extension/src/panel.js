@@ -38,6 +38,48 @@ export function createPanel({ doc }) {
     body.replaceChildren(...children);
   };
 
+  /** @param {import('./proposal-page.js').ProposalDetail} detail */
+  const metaRow = (detail) => {
+    const row = make("div", "fhp-panel__meta");
+    if (detail.status) row.append(make("span", "fhp-panel__badge", detail.status));
+    for (const value of [detail.track, detail.schedule, detail.duration]) {
+      if (value) row.append(make("span", "fhp-panel__meta-item", value));
+    }
+    return row.childElementCount > 0 ? row : null;
+  };
+
+  /** @param {import('./proposal-page.js').ProposalDetail['speaker']} speaker */
+  const speakerRow = ({ name, avatarUrl, twitter }) => {
+    if (!name && !avatarUrl && !twitter) return null;
+
+    const row = make("div", "fhp-panel__speaker");
+    if (avatarUrl) {
+      const avatar = make("img", "fhp-panel__avatar");
+      avatar.src = avatarUrl;
+      avatar.alt = "";
+      row.append(avatar);
+    }
+    if (name) row.append(make("span", "fhp-panel__speaker-name", name));
+    if (twitter) {
+      const handle = make("a", "fhp-panel__speaker-handle", `@${twitter}`);
+      handle.href = `https://twitter.com/${twitter}`;
+      handle.target = "_blank";
+      handle.rel = "noreferrer noopener";
+      row.append(handle);
+    }
+    return row;
+  };
+
+  /** @param {string} abstractHtml */
+  const abstractBlock = (abstractHtml) => {
+    const block = make("div", "fhp-panel__abstract");
+    if (abstractHtml) block.append(sanitizeRichText(abstractHtml, doc));
+    if (block.textContent.trim() === "") {
+      block.replaceChildren(make("p", "fhp-panel__empty", TEXT.emptyAbstract));
+    }
+    return block;
+  };
+
   const footerLink = (url) => {
     const footer = make("div", "fhp-panel__footer");
     const link = make("a", "fhp-panel__link", TEXT.openInFortee);
@@ -64,51 +106,18 @@ export function createPanel({ doc }) {
      * @param {string} url
      */
     renderDetail(detail, url) {
-      const children = [];
+      const hasFavCount = typeof detail.favCount === "number" && !Number.isNaN(detail.favCount);
 
-      const meta = make("div", "fhp-panel__meta");
-      if (detail.status) meta.append(make("span", "fhp-panel__badge", detail.status));
-      for (const value of [detail.track, detail.schedule, detail.duration]) {
-        if (value) meta.append(make("span", "fhp-panel__meta-item", value));
-      }
-      if (meta.childElementCount > 0) children.push(meta);
-
-      children.push(make("h3", "fhp-panel__title", detail.title));
-
-      const { name, avatarUrl, twitter } = detail.speaker;
-      if (name || avatarUrl || twitter) {
-        const speaker = make("div", "fhp-panel__speaker");
-        if (avatarUrl) {
-          const avatar = make("img", "fhp-panel__avatar");
-          avatar.src = avatarUrl;
-          avatar.alt = "";
-          speaker.append(avatar);
-        }
-        if (name) speaker.append(make("span", "fhp-panel__speaker-name", name));
-        if (twitter) {
-          const handle = make("a", "fhp-panel__speaker-handle", `@${twitter}`);
-          handle.href = `https://twitter.com/${twitter}`;
-          handle.target = "_blank";
-          handle.rel = "noreferrer noopener";
-          speaker.append(handle);
-        }
-        children.push(speaker);
-      }
-
-      if (typeof detail.favCount === "number" && !Number.isNaN(detail.favCount)) {
-        children.push(make("div", "fhp-panel__fav", TEXT.fav(detail.favCount)));
-      }
-
-      const abstract = make("div", "fhp-panel__abstract");
-      if (detail.abstractHtml) {
-        abstract.append(sanitizeRichText(detail.abstractHtml, doc));
-      }
-      if (abstract.textContent.trim() === "") {
-        abstract.replaceChildren(make("p", "fhp-panel__empty", TEXT.emptyAbstract));
-      }
-      children.push(abstract, footerLink(url));
-
-      replaceBody(...children);
+      replaceBody(
+        ...[
+          metaRow(detail),
+          make("h3", "fhp-panel__title", detail.title),
+          speakerRow(detail.speaker),
+          hasFavCount ? make("div", "fhp-panel__fav", TEXT.fav(detail.favCount)) : null,
+          abstractBlock(detail.abstractHtml),
+          footerLink(url),
+        ].filter((node) => node !== null),
+      );
     },
 
     /** @param {string} url */
