@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { placePanel } from "../src/position.js";
+import { placePanel } from "../extension/src/position.js";
 
 const viewport = { width: 1000, height: 600 };
 const panel = { width: 360, height: 400 };

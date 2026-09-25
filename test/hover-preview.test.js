@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import { createHoverPreview } from "../src/hover-preview.js";
+import { createHoverPreview } from "../extension/src/hover-preview.js";
 import { loadFixture, readFixture } from "./fixtures.js";
 
 const OPEN_DELAY = 120;

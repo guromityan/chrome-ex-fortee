@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { findProposalTargets, resolveProposalTarget } from "../src/timetable.js";
+import { findProposalTargets, resolveProposalTarget } from "../extension/src/timetable.js";
 import { loadFixture } from "./fixtures.js";
 
 describe("findProposalTargets", () => {

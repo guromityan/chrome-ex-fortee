@@ -11,5 +11,5 @@
     "strict": false,
     "skipLibCheck": true
   },
-  "include": ["src", "test", "content.js", "vitest.config.js"]
+  "include": ["extension", "test", "vitest.config.js"]
 }

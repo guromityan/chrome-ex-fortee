@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "vitest";
 
-import { start } from "../src/main.js";
+import { start } from "../extension/src/main.js";
 import { loadFixture } from "./fixtures.js";
 
 let running;

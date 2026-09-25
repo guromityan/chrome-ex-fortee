@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { parseProposalDetail } from "../src/proposal-page.js";
+import { parseProposalDetail } from "../extension/src/proposal-page.js";
 import { readFixture } from "./fixtures.js";
 
 const detailOf = (name) => parseProposalDetail(readFixture(name));
