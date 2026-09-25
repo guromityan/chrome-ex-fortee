@@ -24,10 +24,12 @@
 1. `chrome://extensions` を開く
 2. 右上の **デベロッパーモード** を ON
 3. **パッケージ化されていない拡張機能を読み込む** をクリック
-4. このリポジトリのルート（`manifest.json` があるディレクトリ）を選択
+4. このリポジトリの **`extension/`** ディレクトリ（`manifest.json` があるディレクトリ）を選択
 5. `https://fortee.jp/yapc-tokyo-2026/timetable` を開いてセッションにカーソルを合わせる
 
-ビルドは不要です。`manifest.json` がそのまま読み込める構成になっています。
+ビルドは不要です。`extension/` がそのまま読み込める構成になっています。
+（テスト用の `node_modules/` などを拡張機能に含めないため、拡張機能本体は `extension/` に分けています。
+Chrome は `_` で始まるファイル名を含むディレクトリを拡張機能として読み込めないため、リポジトリのルートは選べません。）
 コードを変更したら `chrome://extensions` で拡張機能の再読み込みを行ってください。
 
 ## 仕組み
@@ -44,17 +46,17 @@
 
 | パス | 役割 |
 | --- | --- |
-| `manifest.json` | Manifest V3 定義（対象 URL、content script、CSS） |
-| `content.js` | content script から ES モジュール本体を読み込むブートストラップ |
-| `src/main.js` | 実ページとの配線（`fetch` とタイムテーブル判定） |
-| `src/hover-preview.js` | ホバー/フォーカスの制御、パネルの開閉 |
-| `src/panel.js` | パネルの描画（読み込み中・詳細・エラー） |
-| `src/timetable.js` | タイムテーブル DOM からトークを特定 |
-| `src/proposal-page.js` | 詳細ページ HTML から表示項目を抽出 |
-| `src/proposal-store.js` | 取得とキャッシュ |
-| `src/sanitize.js` | 概要 HTML のサニタイズ |
-| `src/position.js` | パネルの配置計算（画面外にはみ出さない） |
-| `styles/panel.css` | パネルのスタイル（ダークモード対応） |
+| `extension/manifest.json` | Manifest V3 定義（対象 URL、content script、CSS） |
+| `extension/content.js` | content script から ES モジュール本体を読み込むブートストラップ |
+| `extension/src/main.js` | 実ページとの配線（`fetch` とタイムテーブル判定） |
+| `extension/src/hover-preview.js` | ホバー/フォーカスの制御、パネルの開閉 |
+| `extension/src/panel.js` | パネルの描画（読み込み中・詳細・エラー） |
+| `extension/src/timetable.js` | タイムテーブル DOM からトークを特定 |
+| `extension/src/proposal-page.js` | 詳細ページ HTML から表示項目を抽出 |
+| `extension/src/proposal-store.js` | 取得とキャッシュ |
+| `extension/src/sanitize.js` | 概要 HTML のサニタイズ |
+| `extension/src/position.js` | パネルの配置計算（画面外にはみ出さない） |
+| `extension/styles/panel.css` | パネルのスタイル（ダークモード対応） |
 
 ## 開発
 

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { sanitizeRichText } from "../src/sanitize.js";
+import { sanitizeRichText } from "../extension/src/sanitize.js";
 
 const sanitizedHtml = (html) => {
   const host = document.createElement("div");

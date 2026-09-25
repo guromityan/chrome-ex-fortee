@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { createProposalStore } from "../src/proposal-store.js";
+import { createProposalStore } from "../extension/src/proposal-store.js";
 import { readFixture } from "./fixtures.js";
 
 const TALK_URL = "/yapc-tokyo-2026/proposal/c38049d1-b9d8-4121-970b-3e9246070e64";

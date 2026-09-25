@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { createPanel } from "../src/panel.js";
+import { createPanel } from "../extension/src/panel.js";
 
 const TALK_URL = "/yapc-tokyo-2026/proposal/c38049d1-b9d8-4121-970b-3e9246070e64";
 
