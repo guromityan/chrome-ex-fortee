@@ -1,0 +1,196 @@
+/*
+ * The hover preview panel.
+ *
+ * fortee ships Bootstrap/Metronic styles that would otherwise leak into the
+ * panel, so sizes and spacing inside it are stated explicitly.
+ */
+
+.fhp-panel {
+  position: fixed;
+  z-index: 2147483000;
+  box-sizing: border-box;
+  width: 380px;
+  max-width: calc(100vw - 16px);
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 14px 16px;
+  border: 1px solid #e4e6ef;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 18%);
+  color: #3f4254;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: left;
+  overscroll-behavior: contain;
+}
+
+.fhp-panel[hidden] {
+  display: none;
+}
+
+.fhp-panel__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: center;
+  margin-bottom: 6px;
+  color: #7e8299;
+  font-size: 12px;
+}
+
+.fhp-panel__badge {
+  padding: 1px 8px;
+  border-radius: 6px;
+  background-color: #f1416c;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.fhp-panel__title {
+  margin: 0 0 8px;
+  color: #181c32;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.fhp-panel__speaker {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.fhp-panel__avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.fhp-panel__speaker-name {
+  font-weight: 600;
+}
+
+.fhp-panel__speaker-handle,
+.fhp-panel__link {
+  color: #3e97ff;
+  text-decoration: none;
+}
+
+.fhp-panel__speaker-handle:hover,
+.fhp-panel__link:hover {
+  text-decoration: underline;
+}
+
+.fhp-panel__fav {
+  margin-bottom: 10px;
+  color: #7e8299;
+  font-size: 12px;
+}
+
+.fhp-panel__abstract {
+  border-top: 1px solid #f1f1f2;
+  padding-top: 10px;
+  word-break: break-word;
+}
+
+.fhp-panel__abstract > :first-child {
+  margin-top: 0;
+}
+
+.fhp-panel__abstract > :last-child {
+  margin-bottom: 0;
+}
+
+.fhp-panel__abstract p,
+.fhp-panel__abstract ul,
+.fhp-panel__abstract ol,
+.fhp-panel__abstract blockquote,
+.fhp-panel__abstract pre {
+  margin: 0 0 8px;
+}
+
+.fhp-panel__abstract ul,
+.fhp-panel__abstract ol {
+  padding-left: 20px;
+}
+
+.fhp-panel__abstract h1,
+.fhp-panel__abstract h2,
+.fhp-panel__abstract h3,
+.fhp-panel__abstract h4,
+.fhp-panel__abstract h5,
+.fhp-panel__abstract h6 {
+  margin: 10px 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.fhp-panel__abstract code,
+.fhp-panel__abstract pre {
+  background-color: #f5f8fa;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.fhp-panel__abstract code {
+  padding: 1px 4px;
+}
+
+.fhp-panel__abstract pre {
+  overflow-x: auto;
+  padding: 8px 10px;
+}
+
+.fhp-panel__abstract a {
+  color: #3e97ff;
+}
+
+.fhp-panel__status,
+.fhp-panel__empty {
+  margin: 0;
+  color: #7e8299;
+  font-size: 12px;
+}
+
+.fhp-panel__error {
+  margin: 0 0 4px;
+  color: #f1416c;
+  font-weight: 600;
+}
+
+.fhp-panel__footer {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #f1f1f2;
+  font-size: 12px;
+}
+
+.fhp-previewable {
+  cursor: pointer;
+}
+
+[data-bs-theme="dark"] .fhp-panel {
+  border-color: #2b2b40;
+  background-color: #1e1e2d;
+  color: #cdcdde;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 50%);
+}
+
+[data-bs-theme="dark"] .fhp-panel__title {
+  color: #f5f8fa;
+}
+
+[data-bs-theme="dark"] .fhp-panel__abstract,
+[data-bs-theme="dark"] .fhp-panel__footer {
+  border-top-color: #2b2b40;
+}
+
+[data-bs-theme="dark"] .fhp-panel__abstract code,
+[data-bs-theme="dark"] .fhp-panel__abstract pre {
+  background-color: #2b2b40;
+}
