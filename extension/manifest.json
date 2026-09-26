@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "fortee タイムテーブル ホバープレビュー",
+  "version": "0.1.0",
+  "description": "forteeのタイムテーブルでセッションにカーソルを合わせると、ページを離れずにトークの詳細を表示します。",
+  "content_scripts": [
+    {
+      "matches": ["https://fortee.jp/*/timetable*"],
+      "js": ["content.js"],
+      "css": ["styles/panel.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/*.js"],
+      "matches": ["https://fortee.jp/*"]
+    }
+  ]
+}
