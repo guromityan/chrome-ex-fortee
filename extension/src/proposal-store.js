@@ -33,5 +33,21 @@ export function createProposalStore({ fetchProposalHtml }) {
       byUrl.set(url, loading);
       return loading;
     },
+
+    /**
+     * Keep the cached detail in sync after a favourite toggle.
+     *
+     * @param {string} url
+     * @param {Partial<import('./proposal-page.js').ProposalDetail>} patch
+     * @returns {Promise<import('./proposal-page.js').ProposalDetail | null>}
+     */
+    async patch(url, patch) {
+      const pending = byUrl.get(url);
+      if (!pending) return null;
+      const detail = await pending;
+      const next = { ...detail, ...patch };
+      byUrl.set(url, Promise.resolve(next));
+      return next;
+    },
   };
 }

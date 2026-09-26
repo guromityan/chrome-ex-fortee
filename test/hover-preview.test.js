@@ -30,14 +30,18 @@ const panelIsVisible = () => {
 
 let preview;
 let requested;
+/** @type {ReturnType<typeof vi.fn> | undefined} */
+let fetchImpl;
 
-const startPreview = (respond) => {
+const startPreview = (respond, favFetch) => {
   requested = [];
+  fetchImpl = favFetch;
   preview = createHoverPreview({
     root: document.body,
     doc: document,
     openDelayMs: OPEN_DELAY,
     closeDelayMs: CLOSE_DELAY,
+    fetchImpl: favFetch,
     fetchProposalHtml: async (url) => {
       requested.push(url);
       return respond ? respond(url) : readFixture("proposal-detail.html");
@@ -204,5 +208,46 @@ describe("hover preview", () => {
     await vi.advanceTimersByTimeAsync(OPEN_DELAY * 2);
 
     expect(document.querySelector(".fhp-panel")).toBeNull();
+  });
+
+  test("favourites a talk through fortee's fav API and paints the timetable ribbon", async () => {
+    const loggedInHtml = readFixture("proposal-detail.html").replace(
+      'data-logged-in="false"',
+      'data-logged-in="true"',
+    );
+    const favFetch = vi.fn(async () =>
+      Response.json({
+        result: "OK",
+        data: { uuid: "c38049d1-b9d8-4121-970b-3e9246070e64", on: true },
+      }),
+    );
+    startPreview(() => loggedInHtml, favFetch);
+
+    hover(cellOf(TALK.url));
+    await vi.advanceTimersByTimeAsync(OPEN_DELAY);
+    /** @type {HTMLButtonElement | null} */ (document.querySelector("button.fhp-panel__fav"))?.click();
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(favFetch).toHaveBeenCalledOnce();
+    const call = /** @type {[unknown]} */ (/** @type {unknown} */ (favFetch.mock.calls[0]));
+    expect(call[0]).toBe("/yapc-tokyo-2026/proposal/fav");
+    expect(document.querySelector("button.fhp-panel__fav")?.getAttribute("aria-pressed")).toBe(
+      "true",
+    );
+    expect(document.querySelector("button.fhp-panel__fav")?.textContent).toContain("5");
+    expect(cellOf(TALK.url)?.classList.contains("fav")).toBe(true);
+  });
+
+  test("explains login is required instead of calling the fav API when signed out", async () => {
+    const favFetch = vi.fn();
+    startPreview(undefined, favFetch);
+
+    hover(cellOf(TALK.url));
+    await vi.advanceTimersByTimeAsync(OPEN_DELAY);
+    /** @type {HTMLButtonElement | null} */ (document.querySelector("button.fhp-panel__fav"))?.click();
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(favFetch).not.toHaveBeenCalled();
+    expect(panelText()).toContain("ログインが必要です");
   });
 });
