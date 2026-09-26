@@ -62,4 +62,15 @@ describe("proposal store", () => {
 
     await expect(store.load(TALK_URL)).rejects.toThrow(/proposal/i);
   });
+
+  test("remembers a favourite toggle without refetching", async () => {
+    const fortee = fakeFortee([]);
+    const store = createProposalStore(fortee);
+
+    await store.load(TALK_URL);
+    await store.patch(TALK_URL, { favorited: true, favCount: 5 });
+
+    await expect(store.load(TALK_URL)).resolves.toMatchObject({ favorited: true, favCount: 5 });
+    expect(fortee.requested).toEqual([TALK_URL]);
+  });
 });
