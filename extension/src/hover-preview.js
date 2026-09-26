@@ -1,3 +1,4 @@
+import { setFavorite, syncTimetableFavorite } from "./favorite.js";
 import { createPanel } from "./panel.js";
 import { createProposalStore } from "./proposal-store.js";
 import { resolveProposalTarget } from "./timetable.js";
@@ -17,6 +18,7 @@ const DEFAULT_CLOSE_DELAY_MS = 200;
  * @param {Element} deps.root the element containing the timetable
  * @param {Document} deps.doc
  * @param {(url: string) => Promise<string>} deps.fetchProposalHtml
+ * @param {typeof fetch} [deps.fetchImpl] used for the favourite POST
  * @param {number} [deps.openDelayMs] pointer rest time before a fetch starts
  * @param {number} [deps.closeDelayMs] grace period for moving into the panel
  */
@@ -24,11 +26,11 @@ export function createHoverPreview({
   root,
   doc,
   fetchProposalHtml,
+  fetchImpl = fetch,
   openDelayMs = DEFAULT_OPEN_DELAY_MS,
   closeDelayMs = DEFAULT_CLOSE_DELAY_MS,
 }) {
   const view = doc.defaultView;
-  const panel = createPanel({ doc });
   const store = createProposalStore({ fetchProposalHtml });
 
   let openTimer = null;
@@ -37,6 +39,61 @@ export function createHoverPreview({
   let pending = null;
   /** @type {import('./timetable.js').ProposalTarget | null} */
   let shown = null;
+  /** @type {string | null} */
+  let favInFlight = null;
+
+  /** @type {ReturnType<typeof createPanel>} */
+  const panel = createPanel({
+    doc,
+    onFavoriteToggle: ({ detail, url, on }) => {
+      void toggleFavorite({ detail, url, on });
+    },
+  });
+
+  /**
+   * @param {{ detail: import('./proposal-page.js').ProposalDetail, url: string, on: boolean }} args
+   */
+  const toggleFavorite = async ({ detail, url, on }) => {
+    if (!detail.uuid || !detail.favApiUrl) return;
+    if (favInFlight === detail.uuid) return;
+    favInFlight = detail.uuid;
+
+    try {
+      const result = await setFavorite({
+        apiUrl: detail.favApiUrl,
+        uuid: detail.uuid,
+        on,
+        fetchImpl,
+      });
+
+      const previousCount =
+        typeof detail.favCount === "number" && !Number.isNaN(detail.favCount)
+          ? detail.favCount
+          : null;
+      const favCount =
+        previousCount === null
+          ? previousCount
+          : Math.max(0, previousCount + (result.on ? 1 : -1));
+
+      await store.patch(url, { favorited: result.on, favCount });
+      if (shown?.url === url) {
+        panel.applyFavoriteState({ favorited: result.on, favCount });
+        place();
+      }
+      syncTimetableFavorite(doc, result.uuid, result.on);
+    } catch (error) {
+      const code = /** @type {{ code?: string, message?: string }} */ (error).code;
+      const message =
+        code === "login_required"
+          ? "ログインが必要です"
+          : error instanceof Error
+            ? error.message
+            : "お気に入りの更新に失敗しました";
+      if (shown?.url === url) panel.showFavoriteError(message);
+    } finally {
+      if (favInFlight === detail.uuid) favInFlight = null;
+    }
+  };
 
   const place = () => {
     if (shown) panel.showAt(shown.element.getBoundingClientRect());
